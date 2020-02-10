@@ -145,12 +145,20 @@ namespace Yarn
 
             /// Pop a value from the stack
             public Value PopValue() {
-                return stack.Pop ();
+                if (stack.Count == 0) {
+                    return Value.NULL;
+                }
+
+                return stack.Pop();
             }
 
             /// Peek at a value from the stack
             public Value PeekValue() {
-                return stack.Peek ();
+                if (stack.Count == 0) {
+                    return Value.NULL;
+                }
+
+                return stack.Peek();
             }
 
             /// Clear the stack
@@ -188,6 +196,10 @@ namespace Yarn
                 return state.currentNodeName;
             }
         }
+
+        // Report last instruction of OpCode RunLine to the client
+        // Default zero is considered safe because its the very first instruction.
+        public int lastRunLineInstruction { get; private set; } = 0;
 
         public enum ExecutionState {
             /** Stopped */
@@ -230,6 +242,22 @@ namespace Yarn
             ResetState ();
             state.currentNodeName = nodeName;
 
+            return true;
+        }
+
+        // JumpTo a specific RunLine instruction in the current node.
+        public bool JumpToRunLineInstruction(int instruction) {
+            if (currentNode.Instructions[instruction] == null) {
+                dialogue.LogErrorMessage($"Cannot set instruction to ID ({instruction}) because it doesn't exist in current Node ({currentNodeName}).");
+                return false;
+            }
+
+            if (currentNode.Instructions[instruction].Opcode != OpCode.RunLine) {
+                dialogue.LogErrorMessage($"Cannot set instruction to ID ({instruction}) because its OpCode is not \"RunLine\".");
+                return false;
+            }
+
+            state.programCounter = instruction;
             return true;
         }
 
@@ -350,6 +378,9 @@ namespace Yarn
                         /** Looks up a string from the string table and
                          *  passes it to the client as a line
                          */
+                        // Save the instruction ID for client to see.
+                        lastRunLineInstruction = state.programCounter;
+
                         string stringKey = i.Operands[0].StringValue;
 
                         var pause = lineHandler(new Line(stringKey));

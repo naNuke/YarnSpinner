@@ -159,7 +159,28 @@ namespace YarnSpinner.Tests
 			Assert.Equal ("rawText", source.First());
 		}
 
-        
-    }
+        [Fact]
+        public void TestJumpingToLastRunLineInstruction()
+        {
+            string path = System.IO.Path.Combine(TestDataPath, "Example.yarn.txt");
+            Yarn.Compiler.Compiler.CompileFile(path, out var program, out stringTable);
+
+            dialogue.SetProgram(program);
+
+            // Set node and line to start at
+            dialogue.SetNode("Start");
+
+            // Set instruction that IS NOT RunLine
+            bool notRunLine = dialogue.JumpToRunLineInstruction(4);
+            Assert.False(notRunLine);
+
+            // Set instruction that IS RunLine
+            bool isRunLine = dialogue.JumpToRunLineInstruction(6);
+            Assert.True(isRunLine);
+
+            dialogue.Stop();
+        }
+
+	}
 }
 

@@ -265,6 +265,18 @@ namespace Yarn {
             
         }
 
+        // Last instruction of OpCode type RunLine
+        public int lastRunLineInstruction {
+            get {
+                return vm.lastRunLineInstruction;
+            }
+        }
+
+        // JumpTo a specific RunLine instruction in the current node.
+        public bool JumpToRunLineInstruction(int instruction) {
+            return vm.JumpToRunLineInstruction(instruction);
+        }
+
         // Prepares to run the named node
         public void SetNode(string startNode = DEFAULT_START) {
             vm.SetNode (startNode);

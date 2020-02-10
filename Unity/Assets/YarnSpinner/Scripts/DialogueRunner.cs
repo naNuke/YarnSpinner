@@ -351,7 +351,6 @@ namespace Yarn.Unity
             if (startAutomatically) {
                 StartDialogue();
             }
-            
         }
 
         /// Adds a program and its base localisation string table
@@ -420,14 +419,14 @@ namespace Yarn.Unity
         }
 
         /// Start the dialogue from a given node
-        public void StartDialogue (string startNode)
+        public void StartDialogue (string startNode, int instruction = 0)
         {
 
             // Stop any processes that might be running already
             dialogueUI.StopAllCoroutines ();
 
             // Get it going
-            RunDialogue (startNode);
+            RunDialogue (startNode, instruction);
         }
 
         private void ContinueDialogue()
@@ -436,7 +435,7 @@ namespace Yarn.Unity
             this.dialogue.Continue();           
         }
 
-        void RunDialogue (string startNode = "Start")
+        void RunDialogue (string startNode = "Start", int instruction = 0)
         {
             // Mark that we're in conversation.
             isDialogueRunning = true;
@@ -445,6 +444,7 @@ namespace Yarn.Unity
             this.dialogueUI.DialogueStarted();
 
             this.dialogue.SetNode(startNode);
+            this.dialogue.JumpToRunLineInstruction(instruction);
 
             ContinueDialogue();
             
